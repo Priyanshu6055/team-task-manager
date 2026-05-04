@@ -1,93 +1,209 @@
 # Team Task Manager
 
-A straightforward full-stack web application for managing team projects and tasks. I built this to solve the common problem of tracking who is working on what without the overhead of complex, bloated enterprise tools. It gives admins the ability to create projects and assign tasks, while team members can log in and update their progress.
+A full-stack project built to manage team workflows in a simple and structured way. The goal was to create a lightweight alternative to complex tools like Trello or Jira, focusing on clarity, role-based control, and real-time task tracking.
 
-## Features
+This application allows admins to manage projects and assign work, while team members can track and update their responsibilities efficiently.
 
-- Authentication (Signup/Login)
-- Role-based access (Admin/Member)
-- Project creation and member management
-- Task creation, assignment, and status updates
-- Dashboard showing basic task stats
-- Task deletion and project deletion (cascading deletes implemented)
+---
 
-## Tech Stack
+## 🚀 Key Features
 
-- Frontend: React built with Vite
-- Backend: Node.js with Express
-- Database: MongoDB via Mongoose
-- Auth: JWT stored in local storage
-- Deployment: Designed for Railway
+* Secure Authentication (JWT-based Signup/Login)
+* Role-Based Access Control (Admin / Member)
+* Project creation with team member assignment
+* Task lifecycle management (create, assign, update status)
+* Dashboard with task insights (total, completed, overdue)
+* Task deletion and project deletion with cascade handling
+* Clean API design with proper validation and error handling
 
-## Project Structure
+---
 
-The repository is split into two main directories:
+## 🧠 Core Design Decisions
 
-- /server: Contains the Node.js backend. Organized into controllers, models, routes, and middleware to keep the business logic separated from routing.
-- /client: Contains the React frontend. Organized into reusable components, pages, context for state management, and services for API calls.
+* **Separation of concerns**: Backend and frontend are independently structured for scalability
+* **Role-based backend enforcement**: Security is handled on the server, not just UI
+* **Minimal but functional UI**: Focused on usability over unnecessary design complexity
+* **Data integrity**: Cascade deletion ensures no orphaned data remains
 
-## API Overview
+---
 
-The backend uses a standard REST pattern. Key endpoints include:
+## 🛠 Tech Stack
 
-- Auth: Handles user registration and login. Returns a JWT that the client stores and sends back in headers for protected routes.
-- Projects: Admins can create, edit, and delete projects. The endpoints filter data so users only see projects they are a part of.
-- Tasks: Handles creating, assigning, updating, and deleting tasks. Regular members can only update the status of tasks assigned to them, while admins have full control.
+**Frontend**
 
-## Setup Instructions
+* React (Vite)
+* Tailwind CSS
 
-To run this locally, follow these steps:
+**Backend**
+
+* Node.js + Express
+* MongoDB + Mongoose
+
+**Authentication**
+
+* JWT (stored in localStorage)
+
+**Deployment**
+
+* Backend: Railway
+* Frontend: Vercel
+
+---
+
+## 📁 Project Structure
+
+```
+/server
+  ├── controllers
+  ├── models
+  ├── routes
+  ├── middleware
+  └── server.js
+
+/client
+  ├── components
+  ├── pages
+  ├── services
+  ├── context
+  └── main.jsx
+```
+
+---
+
+## ⚙️ API Overview
+
+### 🔐 Authentication
+
+* Register and login users
+* JWT issued and verified via middleware
+
+### 📁 Projects
+
+* Admin can create, update, and delete projects
+* Members can only view projects they are assigned to
+
+### ✅ Tasks
+
+* Admin can create and assign tasks
+* Members can update status of assigned tasks
+* Admin retains full control over all tasks
+
+---
+
+## 🧩 Role-Based Access Logic
+
+| Action             | Admin | Member             |
+| ------------------ | ----- | ------------------ |
+| Create Project     | ✅     | ❌                  |
+| Add Members        | ✅     | ❌                  |
+| Create Task        | ✅     | ❌                  |
+| Update Task Status | ✅     | ✅ (own tasks only) |
+| Delete Task        | ✅     | Limited            |
+| Delete Project     | ✅     | ❌                  |
+
+---
+
+## 🧪 Edge Case Handling
+
+* Prevent unauthorized access using middleware checks
+* Handle missing or invalid tokens
+* Prevent task assignment to invalid users
+* Cascade delete tasks when a project is removed
+* Handle empty states gracefully on dashboard
+
+---
+
+## 🧑‍💻 Local Setup
 
 1. Clone the repository
-2. Install dependencies for both the frontend and backend:
-   npm run install:all
-3. Navigate to the server folder and create a .env file (see the Environment Variables section below).
-4. Start the backend server:
-   cd server
-   npm start
-5. In a separate terminal, start the frontend development server:
-   cd client
-   npm run dev
+2. Install dependencies:
 
-The app will be running at http://localhost:5173.
+```
+npm run install:all
+```
 
-## Environment Variables
+3. Create `.env` file in `/server`:
 
-Create a .env file inside the /server directory with the following keys:
-
+```
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+MONGO_URI=your_mongo_uri
+JWT_SECRET=your_secret
+```
 
-- PORT defines where the backend runs.
-- MONGO_URI is your connection string to a local MongoDB instance or MongoDB Atlas.
-- JWT_SECRET is used to sign the authentication tokens.
+4. Start backend:
 
-## Deployment
+```
+cd server
+npm start
+```
 
-The application is structured to be deployed easily as a single service on Railway. 
+5. Start frontend:
 
-The backend server is configured to check if it is running in production. If it is, it serves the compiled React frontend directly from the client/dist folder. When deploying to Railway, simply connect the repository and ensure the build script compiles the React app.
+```
+cd client
+npm run dev
+```
 
-## Demo
+---
 
-Live URL: [Placeholder for live link]
-Demo Video: [Placeholder for video link]
+## 🌐 Deployment
 
-## Challenges & Learnings
+### Backend (Railway)
 
-Building this application under constraints brought up a few practical challenges:
+* Deploy only `/server`
+* Set environment variables in Railway dashboard
+* Start command:
 
-- Time constraints: I had to prioritize core functionality and clean code over complex UI additions or heavily abstracted design patterns.
-- Handling role-based access: Ensuring that members could not bypass the UI to perform admin actions required careful middleware checks on the backend, not just hiding buttons on the frontend.
-- Managing relationships between models: Deleting a project leaves orphaned tasks in the database. I implemented cascade deletion in the project controller to ensure all related tasks are automatically removed when a project is deleted.
-- Deployment issues: Setting up Vite's proxy for local development while ensuring the Express server correctly serves static files in production required a clean separation of environments.
+```
+node server.js
+```
 
-## Future Improvements
+### Frontend (Vercel)
 
-If I had more time to work on this, I would add:
+* Deploy `/client`
+* Add environment variable:
 
-- Notifications when a user is assigned a new task
-- Activity logs to track who updated a task's status
-- Better UI elements like drag-and-drop boards for task management
-- Real-time updates so team members don't have to refresh to see new tasks
+```
+VITE_API_URL=https://your-backend-url
+```
+
+---
+
+## 🎥 Demo
+
+Live URL: [Add your deployed link]
+Demo Video: [Add your video link]
+
+---
+
+## ⚠️ Challenges Faced
+
+* Designing secure role-based access without relying on frontend checks
+* Managing relationships between users, projects, and tasks
+* Handling deployment issues due to monorepo structure
+* Ensuring backend and frontend communication works across environments
+
+---
+
+## 📈 Learnings
+
+* Importance of backend validation for security
+* Structuring scalable APIs
+* Real-world debugging during deployment
+* Managing state and API integration in React apps
+
+---
+
+## 🚀 Future Improvements
+
+* Real-time updates using WebSockets
+* Activity logs for audit tracking
+* Notifications for task assignments
+* Drag-and-drop task board (Kanban style)
+* Pagination and filtering for large datasets
+
+---
+
+## 💡 Final Note
+
+This project was built with a focus on functionality, clarity, and real-world usability under time constraints. Instead of over-engineering, the priority was to deliver a clean, working system that demonstrates strong fundamentals in full-stack development.
